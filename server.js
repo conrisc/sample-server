@@ -1,4 +1,5 @@
 const http = require('http');
+const qs = require('querystring');
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -22,9 +23,22 @@ var pageHTML = '<html>' +
                 '</html>';
 
 const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/html');
-  res.end(pageHTML);
+    res.statusCode = 200;
+    var requestData = '';
+    res.setHeader('Content-Type', 'text/html');
+    if (req.method === "GET") {
+        res.end(pageHTML);
+    }
+    else if (req.method === "POST") {
+        req.setEncoding('utf-8');
+        req.on('data', function(data) {        
+            requestData += data;
+        });
+        req.on('end', function() {
+            var postData = qs.parse(requestData);
+            res.end(postData.nickname);
+        });
+    }
 });
 
 server.listen(port, hostname, () => {
